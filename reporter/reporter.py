@@ -25,6 +25,7 @@ class Reports(commands.Cog):
         texta = """**React with the type of your report:**
 1️⃣ | Staff Report
 2️⃣ | User Report
+❌ | Cancel
 """
         
         
@@ -39,48 +40,65 @@ class Reports(commands.Cog):
 
         def check(r, u):
           return u == ctx.author
-        
-        reaction, user = await self.bot.wait_for("reaction_add", check=check)
+        try:
+          reaction, user = await self.bot.wait_for("reaction_add", timeout=20.0, check=check)
+        except asyncio.TimeoutError:
+          embedTimeout = discord.Embed(description="❌ | You took too long! Command cancelled", color=3066993)
+          return await reactionmsg.edit(embed = embedTimeout)
 
         if str(reaction.emoji) == '1️⃣':
-          await ctx.send("ok 1")
           await reactionmsg.clear_reactions()
 
-          text = "Alright, we'll do a staff report. What is the username of the user you're reporting?\n1/5"
+          text = "Alright, we'll do a staff report. What is the username of the user you're reporting? You have 2 minutes to reply."
           await reactionmsg.edit(embed = discord.Embed(description=text, color=self.bot.main_color))
-          username = await self.bot.wait_for('message', check=checkmsg)
-          #await ctx.send(username.content)
+
+          try:
+            username = await self.bot.wait_for('message', check=checkmsg, timeout=120)
+          except asyncio.TimeoutError:
+            embedTimeout = discord.Embed(description="❌ | You took too long! Command cancelled", color=3066993)
+            return await reactionmsg.edit(embed = embedTimeout)
           await username.delete()
 
-          text = "What is the rank of the suspect?\n2/5"
+          text = "What is the rank of the suspect? You have 2 minutes to reply."
           await reactionmsg.edit(embed = discord.Embed(description=text, color=self.bot.main_color))
-          rank = await self.bot.wait_for('message', check=checkmsg)
-          #await ctx.send(rank.content)
+
+          try:
+            rank = await self.bot.wait_for('message', check=checkmsg, timeout=120)
+          except asyncio.TimeoutError:
+            embedTimeout = discord.Embed(description="❌ | You took too long! Command cancelled", color=3066993)
+            return await reactionmsg.edit(embed = embedTimeout)
           await rank.delete()
           
-          text = "What is the reason for this report?\n3/5"
-          await reactionmsg.edit(embed = discord.Embed(description=text, color=self.bot.main_color))
-          reason = await self.bot.wait_for('message', check=checkmsg)
-          #await ctx.send(reason.content)
+          text = "What is the reason for this report? You have 2 minutes to reply."
+          await reactionmsg.edit(embed = discord.Embed(description=text, color=self.bot.main_color,))
+
+          try:
+            reason = await self.bot.wait_for('message', check=checkmsg, timeout=120)
+          except asyncio.TimeoutError:
+            embedTimeout = discord.Embed(description="❌ | You took too long! Command cancelled", color=3066993)
+            return await reactionmsg.edit(embed = embedTimeout)
           await reason.delete()
 
-          text = "Please provide proof of this happening. You can upload a video/image or use a link to an image or video.\n4/5"
+          text = "Please provide proof of this happening. You can upload a video/image or use a link to an image or video. The report will be sent right after. You have 10 minutes to reply."
           await reactionmsg.edit(embed = discord.Embed(description=text, color=self.bot.main_color))
-          proof = await self.bot.wait_for('message', check=checkmsg)
-          #await ctx.send(proof.content)
+
+          try:
+            proof = await self.bot.wait_for('message', check=checkmsg, timeout=600)
+          except asyncio.TimeoutError:
+            embedTimeout = discord.Embed(description="❌ | You took too long! Command cancelled", color=3066993)
+            return await reactionmsg.edit(embed = embedTimeout)
           my_files = [await x.to_file() for x in proof.attachments]
-          await ctx.send(str(my_files))
           await proof.delete()
 
-          reportEmbed = discord.Embed(description=f"Username: {username.content}\nRank: {rank.content}\nReason: {reason.content}\nProof: {proof.content}", color=self.bot.main_color)
+          reportEmbed = discord.Embed(title="New Staff Report", description=f"Username: {username.content}\nRank: {rank.content}\nReason: {reason.content}\nProof: {proof.content}", color=self.bot.main_color)
 
           await staffChannel.send(embed = reportEmbed, files = my_files)
-          text = "The report has successfully been sent!\n5/5"
-          await reactionmsg.edit(embed = discord.Embed(description=text, color=self.bot.main_color))
+          text = "The report has successfully been sent!"
+          await reactionmsg.edit(embed = discord.Embed(description=text, color=3066993))
 
         if str(reaction.emoji) == '2️⃣':
-          #editmsg("Alright, we'll do a normal user report. What is the username of the user you're reporting?")
-          return await ctx.send("coming soon")
+          text = "Alright, we'll do a normal user report. What is the username of the user you're reporting?")
+          await reactionmsg.edit(embed = discord.Embed(description=text, color=self.bot.main_color))
 
         if str(reaction.emoji) == '❌':
           cancelEmbed = discord.Embed(description="❌ | Cancelled report", color=15158332)

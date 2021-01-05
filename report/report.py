@@ -28,7 +28,7 @@ class Reports(commands.Cog):
 ❌ | Cancel
 """
         
-        
+        embedTimeout = discord.Embed(description="❌ | You took too long! Command cancelled", color=3066993)
         embed1 = discord.Embed(description=texta, color=self.bot.main_color)
         embed1.set_footer(text="React with ❌ to cancel")
         reactionmsg = await ctx.send(embed = embed1)
@@ -43,7 +43,6 @@ class Reports(commands.Cog):
         try:
           reaction, user = await self.bot.wait_for("reaction_add", timeout=20.0, check=check)
         except asyncio.TimeoutError:
-          embedTimeout = discord.Embed(description="❌ | You took too long! Command cancelled", color=3066993)
           return await reactionmsg.edit(embed = embedTimeout)
 
         if str(reaction.emoji) == '1️⃣':
@@ -55,7 +54,7 @@ class Reports(commands.Cog):
           try:
             username = await self.bot.wait_for('message', check=checkmsg, timeout=120)
           except asyncio.TimeoutError:
-            embedTimeout = discord.Embed(description="❌ | You took too long! Command cancelled", color=3066993)
+            
             return await reactionmsg.edit(embed = embedTimeout)
           await username.delete()
 
@@ -65,7 +64,6 @@ class Reports(commands.Cog):
           try:
             rank = await self.bot.wait_for('message', check=checkmsg, timeout=120)
           except asyncio.TimeoutError:
-            embedTimeout = discord.Embed(description="❌ | You took too long! Command cancelled", color=3066993)
             return await reactionmsg.edit(embed = embedTimeout)
           await rank.delete()
           
@@ -75,7 +73,6 @@ class Reports(commands.Cog):
           try:
             reason = await self.bot.wait_for('message', check=checkmsg, timeout=120)
           except asyncio.TimeoutError:
-            embedTimeout = discord.Embed(description="❌ | You took too long! Command cancelled", color=3066993)
             return await reactionmsg.edit(embed = embedTimeout)
           await reason.delete()
 
@@ -85,7 +82,6 @@ class Reports(commands.Cog):
           try:
             proof = await self.bot.wait_for('message', check=checkmsg, timeout=600)
           except asyncio.TimeoutError:
-            embedTimeout = discord.Embed(description="❌ | You took too long! Command cancelled", color=3066993)
             return await reactionmsg.edit(embed = embedTimeout)
           my_files = [await x.to_file() for x in proof.attachments]
           await proof.delete()
